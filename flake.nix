@@ -16,6 +16,7 @@
             maven
             jdk21
             git
+            gnupg
           ];
           shellHook = ''
             echo "Loaded dev shell with Maven and JDK."

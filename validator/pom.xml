@@ -4,14 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.vanfleteren</groupId>
-        <artifactId>nonulls</artifactId>
+        <groupId>net.vanfleteren.nonulls</groupId>
+        <artifactId>nonulls-parent</artifactId>
         <version>${revision}</version>
     </parent>
 
     <artifactId>validator</artifactId>
     <name>validator</name>
-
 
     <build>
         <plugins>

@@ -4,23 +4,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.vanfleteren</groupId>
-        <artifactId>nonulls</artifactId>
+        <groupId>net.vanfleteren.nonulls</groupId>
+        <artifactId>nonulls-parent</artifactId>
         <version>${revision}</version>
     </parent>
 
-    <artifactId>jackson</artifactId>
+    <artifactId>vavr-support</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>net.vanfleteren</groupId>
+            <groupId>net.vanfleteren.nonulls</groupId>
             <artifactId>validator</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.19.2</version>
+            <groupId>io.vavr</groupId>
+            <artifactId>vavr</artifactId>
         </dependency>
     </dependencies>
 

@@ -1,4 +1,5 @@
 target/
+htmlReport/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -15,7 +16,11 @@ buildNumber.properties
 **/.flattened-pom.xml
 
 # IDEs
-.idea/
+.idea/*
+!.idea/inspectionProfiles
+!.idea/inspectionProfiles/**
+!.idea/dictionaries
+!.idea/dictionaries/**
 *.iml
 *.iws
 *.ipr

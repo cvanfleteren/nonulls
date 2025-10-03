@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.vanfleteren</groupId>
-    <artifactId>nonulls</artifactId>
+    <groupId>net.vanfleteren.nonulls</groupId>
+    <artifactId>nonulls-parent</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
     <name>parent</name>
@@ -21,7 +21,8 @@
     </developers>
     <modules>
         <module>validator</module>
-        <module>jackson</module>
+        <module>jackson2</module>
+        <module>vavr-support</module>
     </modules>
     <scm>
         <connection>scm:git:https://github.com/cvanfleteren/nonulls.git</connection>
@@ -30,7 +31,7 @@
         <url>https://github.com/cvanfleteren/nonulls</url>
     </scm>
     <properties>
-        <revision>0.0.1-SNAPSHOT</revision>
+        <revision>0.0.2-SNAPSHOT</revision>
         <java.version>21</java.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -46,6 +47,11 @@
                 <artifactId>lombok</artifactId>
                 <version>1.18.30</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.vavr</groupId>
+                <artifactId>vavr</artifactId>
+                <version>0.10.6</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

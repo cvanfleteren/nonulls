@@ -17,50 +17,50 @@ class NullValidatorRecordsTest {
     @Test
     void nestedRecords_nullInInnerField_isReportedWithFullPath() {
         Outer obj = new Outer(new Inner(null));
-        NullsFoundException ex = assertThrows(NullsFoundException.class, () -> NullValidator.assertNoNulls(obj));
-        assertEquals(List.of("root.inner.s"), ex.getNullPaths());
+        
+        assertEquals(List.of("root.inner.s"), NullValidator.findNullPaths(obj));
     }
 
     @Test
     void optionalEmpty_isAllowed() {
         Optional<String> empty = Optional.empty();
-        assertDoesNotThrow(() -> NullValidator.assertNoNulls(empty));
-        assertTrue(NullValidator.hasNoNulls(empty));
+        
+        assertEquals(java.util.List.of(), NullValidator.findNullPaths(empty));
     }
 
     @Test
     void optionalWithNestedRecordContainingNull_reportsWithGetPath() {
         Optional<Inner> opt = Optional.of(new Inner(null));
-        NullsFoundException ex = assertThrows(NullsFoundException.class, () -> NullValidator.assertNoNulls(opt));
-        assertEquals(List.of("root.s"), ex.getNullPaths());
+        
+        assertEquals(List.of("root.s"), NullValidator.findNullPaths(opt));
     }
 
     @Test
     void recordOptional_innerIsNull_reportsFieldPath() {
         OptionalHolder holder = new OptionalHolder(null);
-        NullsFoundException ex = assertThrows(NullsFoundException.class, () -> NullValidator.assertNoNulls(holder));
-        assertEquals(List.of("root.inner"), ex.getNullPaths());
+        
+        assertEquals(List.of("root.inner"), NullValidator.findNullPaths(holder));
     }
 
     @Test
     void recordOptional_emptyIsAllowed() {
         OptionalHolder holder = new OptionalHolder(Optional.empty());
-        assertDoesNotThrow(() -> NullValidator.assertNoNulls(holder));
-        assertTrue(NullValidator.hasNoNulls(holder));
+        
+        assertEquals(java.util.List.of(), NullValidator.findNullPaths(holder));
     }
 
     @Test
     void recordOptional_presentInnerWithNull_reportsWithGetPath() {
         OptionalHolder holder = new OptionalHolder(Optional.of(new Inner(null)));
-        NullsFoundException ex = assertThrows(NullsFoundException.class, () -> NullValidator.assertNoNulls(holder));
-        assertEquals(List.of("root.inner.s"), ex.getNullPaths());
+        
+        assertEquals(List.of("root.inner.s"), NullValidator.findNullPaths(holder));
     }
 
     @Test
     void recordOptional_presentInnerWithoutNulls_passes() {
         OptionalHolder holder = new OptionalHolder(Optional.of(new Inner("inner")));
-        assertDoesNotThrow(() -> NullValidator.assertNoNulls(holder));
-        assertTrue(NullValidator.hasNoNulls(holder));
+        
+        assertEquals(java.util.List.of(), NullValidator.findNullPaths(holder));
     }
 
     @Test
@@ -72,21 +72,20 @@ class NullValidatorRecordsTest {
         map.put(null, 2);      // null key -> root.map.key[null]
         WithCollections rec = new WithCollections(list, map);
 
-        NullsFoundException ex = assertThrows(NullsFoundException.class, () -> NullValidator.assertNoNulls(rec));
-        assertEquals(List.of("root.list[1]", "root.map[y]", "root.map.key[null]"), ex.getNullPaths());
+        assertEquals(List.of("root.list[1]", "root.map[y]", "root.map.key[null]"), NullValidator.findNullPaths(rec));
     }
 
     @Test
     void recordWithCollections_nullFields_reportFieldPaths() {
         WithCollections rec = new WithCollections(null, null);
-        NullsFoundException ex = assertThrows(NullsFoundException.class, () -> NullValidator.assertNoNulls(rec));
-        assertEquals(List.of("root.list", "root.map"), ex.getNullPaths());
+        
+        assertEquals(List.of("root.list", "root.map"), NullValidator.findNullPaths(rec));
     }
 
     @Test
     void recordWithCollections_noNulls_passes() {
         WithCollections rec = new WithCollections(List.of("a", "b"), Map.of("k", 1));
-        assertDoesNotThrow(() -> NullValidator.assertNoNulls(rec));
-        assertTrue(NullValidator.hasNoNulls(rec));
+        
+        assertEquals(java.util.List.of(), NullValidator.findNullPaths(rec));
     }
 }

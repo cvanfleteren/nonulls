@@ -1,6 +1,11 @@
 package net.vanfleteren.nonulls.validation;
 
+import net.vanfleteren.nonulls.validation.spi.RecursiveValidator;
+import net.vanfleteren.nonulls.validation.spi.TypeValidator;
+
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.RecordComponent;
 import java.util.*;
 
@@ -9,6 +14,16 @@ import java.util.*;
  * This includes recursively checking inside collections, arrays, optionals, pojos and records.
  */
 public class NullValidator {
+
+    private static final List<TypeValidator> CUSTOM_VALIDATORS;
+
+    static {
+        // Load custom validators via ServiceLoader
+        List<TypeValidator> validators = new ArrayList<>();
+        ServiceLoader<TypeValidator> loader = ServiceLoader.load(TypeValidator.class);
+        loader.forEach(validators::add);
+        CUSTOM_VALIDATORS = Collections.unmodifiableList(validators);
+    }
 
     private NullValidator() {
         // Utility class
@@ -21,11 +36,23 @@ public class NullValidator {
      * @throws NullsFoundException if any null value is found in the object graph
      */
     public static void assertNoNulls(Object obj) {
-        List<String> nullPaths = new ArrayList<>();
-        collectNullPaths(obj, "root", new HashSet<>(), nullPaths);
+        List<String> nullPaths = findNullPaths(obj);
         if (!nullPaths.isEmpty()) {
             throw new NullsFoundException(nullPaths);
         }
+    }
+
+    /**
+     * Validates that the given object and its entire object graph contains no null values.
+     *
+     * @param obj the object to validate
+     * @return a list of paths where nulls were found, empty if no nulls were found
+     */
+    public static List<String> findNullPaths(Object obj) {
+        List<String> nullPaths = new ArrayList<>();
+        collectNullPaths(obj, "root", new HashSet<>(), nullPaths);
+
+        return nullPaths;
     }
 
     /**
@@ -51,14 +78,22 @@ public class NullValidator {
             return;
         }
 
-        // Handle Optional
+        // Check custom validators first
+        for (TypeValidator validator : CUSTOM_VALIDATORS) {
+            if (validator.canHandle(clazz)) {
+                RecursiveValidator recursiveValidator = NullValidator::collectNullPaths;
+                validator.validate(obj, path, visited, nullPaths, recursiveValidator);
+                return;
+            }
+        }
+
+
         switch (obj) {
             case Optional<?> optional -> {
                 optional.ifPresent(value -> collectNullPaths(value, path, visited, nullPaths));
                 return;
             }
 
-            // Handle Collections
             case Collection<?> collection -> {
                 int index = 0;
                 for (Object item : collection) {
@@ -68,11 +103,37 @@ public class NullValidator {
                 return;
             }
 
-            // Handle Maps
             case Map<?, ?> map -> {
                 for (Map.Entry<?, ?> entry : map.entrySet()) {
                     collectNullPaths(entry.getKey(), path + ".key[" + entry.getKey() + "]", visited, nullPaths);
                     collectNullPaths(entry.getValue(), path + "[" + entry.getKey() + "]", visited, nullPaths);
+                }
+                return;
+            }
+
+            case Record record -> {
+                RecordComponent[] components = clazz.getRecordComponents();
+                for (RecordComponent component : components) {
+                    try {
+                        var accessor = component.getAccessor();
+                        boolean wasAccessible = accessor.canAccess(obj);
+                        if (!wasAccessible) {
+                            accessor.setAccessible(true);
+                        }
+                        try {
+                            Object value = accessor.invoke(obj);
+                            collectNullPaths(value, path + "." + component.getName(), visited, nullPaths);
+                        } finally {
+                            if (!wasAccessible) {
+                                try {
+                                    accessor.setAccessible(false);
+                                } catch (Exception ignored) {
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException("Failed to access record component: " + component.getName() + " at " + path + ". Is the component accessible?", e);
+                    }
                 }
                 return;
             }
@@ -92,29 +153,15 @@ public class NullValidator {
             return;
         }
 
-        // Handle Records
-        if (clazz.isRecord()) {
-            RecordComponent[] components = clazz.getRecordComponents();
-            for (RecordComponent component : components) {
-                try {
-                    Object value = component.getAccessor().invoke(obj);
-                    collectNullPaths(value, path + "." + component.getName(), visited, nullPaths);
-                } catch (Exception e) {
-                    throw new RuntimeException("Failed to access record component: " + component.getName() + " at " + path+". Is the component public?", e);
-                }
-            }
-            return;
-        }
-
         // Handle regular (non-record) classes by reflecting over fields
         // Iterate through class hierarchy to include inherited fields
         Class<?> current = clazz;
         while (current != null && current != Object.class) {
-            java.lang.reflect.Field[] fields = current.getDeclaredFields();
-            for (java.lang.reflect.Field field : fields) {
+            Field[] fields = current.getDeclaredFields();
+            for (Field field : fields) {
                 // Skip static fields and synthetic fields (like this$0)
                 int modifiers = field.getModifiers();
-                if (java.lang.reflect.Modifier.isStatic(modifiers) || field.isSynthetic()) {
+                if (Modifier.isStatic(modifiers) || field.isSynthetic()) {
                     continue;
                 }
                 boolean wasAccessible = field.canAccess(obj);
@@ -125,11 +172,14 @@ public class NullValidator {
                     Object value = field.get(obj);
                     collectNullPaths(value, path + "." + field.getName(), visited, nullPaths);
                 } catch (Exception e) {
-                    throw new RuntimeException("Failed to access field: " + field.getName() + " at " + path + ". Is the field accessible?", e);
+                    throw new RuntimeException("Failed to access field: " + field.getName() + "of type " + field.getClass() + " at " + path + ". Is the field accessible?", e);
                 } finally {
-                    // restore original accessibility state
+                    // restore the original accessibility state
                     if (!wasAccessible) {
-                        try { field.setAccessible(false); } catch (Exception ignored) {}
+                        try {
+                            field.setAccessible(false);
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
             }

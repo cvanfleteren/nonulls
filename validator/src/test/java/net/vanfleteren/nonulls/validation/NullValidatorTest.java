@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,18 +12,19 @@ class NullValidatorTest {
 
     @Test
     void noNullsInSimpleValues() {
-        // primitives/wrappers/strings should be fine
-        NullValidator.assertNoNulls(42);
-        NullValidator.assertNoNulls("hello");
-        NullValidator.assertNoNulls(3.14);
-        NullValidator.assertNoNulls(BigDecimal.valueOf(100));
-        assertTrue(NullValidator.hasNoNulls("ok"));
+        
+        assertEquals(List.of(), NullValidator.findNullPaths(42));
+        assertEquals(List.of(), NullValidator.findNullPaths("hello"));
+        assertEquals(List.of(), NullValidator.findNullPaths(3.14));
+        assertEquals(List.of(), NullValidator.findNullPaths(BigDecimal.valueOf(100)));
+        assertEquals(List.of(), NullValidator.findNullPaths("ok"));
     }
 
     @Test
     void hasNoNulls_returnsFalseWhenNullsFound() {
         HashMap<String, String> map = new HashMap<>();
         map.put("ok", null);
-        assertFalse(NullValidator.hasNoNulls(map));
+
+        assertEquals(java.util.List.of("root[ok]"), NullValidator.findNullPaths(map));
     }
 }
