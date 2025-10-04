@@ -4,7 +4,7 @@ name: Release
 on:
   push:
     tags:
-      - '*'
+      - 'v*'
 
 permissions:
   contents: write  # needed for creating GitHub Releases
@@ -28,32 +28,38 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
 
-      - name: Build and test
-        run: mvn -B -ntp clean verify -Drevision="${GITHUB_REF_NAME}"
+      - name: Validate tag and compute version
+        id: vars
+        shell: bash
         env:
-          GITHUB_REF_NAME: ${{ github.ref_name }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG#v}"
+          if [[ "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "is_semver=true" >> "$GITHUB_OUTPUT"
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+            echo "Tag $TAG is valid SemVer; using version $VERSION"
+          else
+            echo "is_semver=false" >> "$GITHUB_OUTPUT"
+            echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+            echo "Tag $TAG is not valid SemVer (after stripping leading 'v'). Skipping release steps."
+          fi
 
-      - name: Create GitHub Release and upload jars
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            validator/target/*.jar
-            jackson/target/*.jar
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and test
+        if: steps.vars.outputs.is_semver == 'true'
+        run: mvn -B -ntp clean verify -Drevision="${{ steps.vars.outputs.version }}"
 
       - name: Publish to Maven Central
-        run: mvn -B -ntp -DskipTests=true deploy -Drevision="${GITHUB_REF_NAME}" -Pgpg-sign
+        if: steps.vars.outputs.is_semver == 'true'
+        run: mvn -B -ntp -DskipTests=true deploy -Drevision="${{ steps.vars.outputs.version }}" -Pgpg-sign
         env:
-          GITHUB_REF_NAME: ${{ github.ref_name }}
           CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
           CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Print success message
+        if: steps.vars.outputs.is_semver == 'true'
         run: |
-          echo "✅ Successfully released ${GITHUB_REF_NAME}"
+          echo "✅ Successfully released tag ${{ github.ref_name }} (version ${{ steps.vars.outputs.version }})"
           echo "✅ GitHub Release created with artifacts"
           echo "✅ Published to Maven Central"
-        env:
-          GITHUB_REF_NAME: ${{ github.ref_name }}
