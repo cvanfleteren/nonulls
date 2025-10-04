@@ -10,7 +10,8 @@
     </parent>
 
     <artifactId>validator</artifactId>
-    <name>validator</name>
+    <name>NoNulls Validator</name>
+    <description>Core utilities to detect and report nulls in object graphs.</description>
 
     <build>
         <plugins>

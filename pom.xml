@@ -6,8 +6,8 @@
     <artifactId>nonulls-parent</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
-    <name>parent</name>
-    <description>Parent pom</description>
+    <name>NoNulls (Parent POM)</name>
+    <description>Parent/aggregator POM for the NoNulls project.</description>
     <url>https://github.com/cvanfleteren/nonulls</url>
     <licenses>
         <license>
@@ -17,7 +17,15 @@
         </license>
     </licenses>
     <developers>
-        <developer/>
+        <developer>
+            <id>cvanfleteren</id>
+            <name>Christophe Vanfleteren</name>
+            <url>https://github.com/cvanfleteren</url>
+            <roles>
+                <role>owner</role>
+                <role>developer</role>
+            </roles>
+        </developer>
     </developers>
     <modules>
         <module>validator</module>
@@ -172,7 +180,9 @@
                 <version>0.9.0</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <autoPublish>true</autoPublish>
                     <publishingServerId>central</publishingServerId>
+                    <waitForPublishCompletion>true</waitForPublishCompletion>
                 </configuration>
             </plugin>
         </plugins>

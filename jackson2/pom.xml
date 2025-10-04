@@ -8,6 +8,8 @@
         <artifactId>nonulls-parent</artifactId>
         <version>${revision}</version>
     </parent>
+    <name>NoNulls Jackson 2 integration</name>
+    <description>Integration of NoNulls validator with Jackson2</description>
 
     <artifactId>jackson2</artifactId>
     <dependencies>
