@@ -53,7 +53,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.30</version>
+                <version>1.18.42</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -182,8 +182,44 @@
                 <configuration>
                     <autoPublish>true</autoPublish>
                     <publishingServerId>central</publishingServerId>
-                    <waitForPublishCompletion>true</waitForPublishCompletion>
+                    <waitUntil>validated</waitUntil>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <fail>true</fail>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.9,)</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>[21,)</version>
+                                </requireJavaVersion>
+                                <requirePluginVersions>
+                                    <unCheckedPluginList>
+                                        org.apache.maven.plugins:maven-clean-plugin,
+                                        org.apache.maven.plugins:maven-install-plugin,
+                                        org.apache.maven.plugins:maven-deploy-plugin,
+                                        org.apache.maven.plugins:maven-site-plugin,
+                                        org.apache.maven.plugins:maven-jar-plugin,
+                                        org.apache.maven.plugins:maven-resources-plugin
+                                    </unCheckedPluginList>
+                                </requirePluginVersions>
+                                <dependencyConvergence/>
+                                <requireUpperBoundDeps/>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
