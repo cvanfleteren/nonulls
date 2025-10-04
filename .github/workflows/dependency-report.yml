@@ -1,0 +1,38 @@
+name: Dependency & Plugin Updates Report
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # every Monday 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Dependency updates
+        run: mvn -B -ntp versions:display-dependency-updates | tee dep.txt
+
+      - name: Plugin updates
+        run: mvn -B -ntp versions:display-plugin-updates | tee plug.txt
+
+      - name: Property updates
+        run: mvn -B -ntp versions:display-property-updates | tee prop.txt
+
+      - name: Summarize results
+        run: |
+          {
+            echo '### Dependency updates';
+            sed -n '1,200p' dep.txt;
+            echo;
+            echo '### Plugin updates';
+            sed -n '1,200p' plug.txt;
+            echo;
+            echo '### Property updates';
+            sed -n '1,200p' prop.txt;
+          } >> $GITHUB_STEP_SUMMARY
