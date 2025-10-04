@@ -25,6 +25,6 @@ class NullValidatorTest {
         HashMap<String, String> map = new HashMap<>();
         map.put("ok", null);
 
-        assertEquals(java.util.List.of("root[ok]"), NullValidator.findNullPaths(map));
+        assertEquals(List.of("root[ok]"), NullValidator.findNullPaths(map));
     }
 }

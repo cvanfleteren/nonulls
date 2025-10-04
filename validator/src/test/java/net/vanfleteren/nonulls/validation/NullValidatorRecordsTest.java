@@ -86,6 +86,6 @@ class NullValidatorRecordsTest {
     void recordWithCollections_noNulls_passes() {
         WithCollections rec = new WithCollections(List.of("a", "b"), Map.of("k", 1));
         
-        assertEquals(java.util.List.of(), NullValidator.findNullPaths(rec));
+        assertEquals(List.of(), NullValidator.findNullPaths(rec));
     }
 }

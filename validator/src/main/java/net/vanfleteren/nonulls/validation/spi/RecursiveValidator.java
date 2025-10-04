@@ -1,5 +1,7 @@
 package net.vanfleteren.nonulls.validation.spi;
 
+import org.jspecify.annotations.Nullable;
+
 import java.util.List;
 import java.util.Set;
 
@@ -9,5 +11,5 @@ import java.util.Set;
  */
 @FunctionalInterface
 public interface RecursiveValidator {
-    void validate(Object obj, String path, Set<Integer> visited, List<String> nullPaths);
+    void validate(@Nullable Object obj, String path, Set<Integer> visited, List<String> nullPaths);
 }

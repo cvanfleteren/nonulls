@@ -8,8 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class NullValidatorCollectionsTest {
 
-    // Helper records for complex mixed collection tests
-
     record Outer(Inner inner) {
         record Inner(String s) {}
     }

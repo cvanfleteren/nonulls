@@ -2,6 +2,7 @@ package net.vanfleteren.nonulls.validation;
 
 import net.vanfleteren.nonulls.validation.spi.RecursiveValidator;
 import net.vanfleteren.nonulls.validation.spi.TypeValidator;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -35,7 +36,7 @@ public class NullValidator {
      * @param obj the object to validate
      * @throws NullsFoundException if any null value is found in the object graph
      */
-    public static void assertNoNulls(Object obj) {
+    public static void assertNoNulls(@Nullable Object obj) throws NullsFoundException {
         List<String> nullPaths = findNullPaths(obj);
         if (!nullPaths.isEmpty()) {
             throw new NullsFoundException(nullPaths);
@@ -48,7 +49,7 @@ public class NullValidator {
      * @param obj the object to validate
      * @return a list of paths where nulls were found, empty if no nulls were found
      */
-    public static List<String> findNullPaths(Object obj) {
+    public static List<String> findNullPaths(@Nullable Object obj) {
         List<String> nullPaths = new ArrayList<>();
         collectNullPaths(obj, "root", new HashSet<>(), nullPaths);
 
@@ -56,9 +57,19 @@ public class NullValidator {
     }
 
     /**
+     * Checks if the object and its entire object graph contain no null values.
+     *
+     * @param obj the object to check
+     * @return true if no nulls are found, false otherwise
+     */
+    public static boolean hasNoNulls(@Nullable Object obj) {
+       return findNullPaths(obj).isEmpty();
+    }
+
+    /**
      * Internal helper to collect all null paths without throwing immediately.
      */
-    private static void collectNullPaths(Object obj, String path, Set<Integer> visited, List<String> nullPaths) {
+    private static void collectNullPaths(@Nullable Object obj, String path, Set<Integer> visited, List<String> nullPaths) {
         if (obj == null) {
             nullPaths.add(path);
             return;
@@ -187,20 +198,7 @@ public class NullValidator {
         }
     }
 
-    /**
-     * Checks if the object and its entire object graph contain no null values.
-     *
-     * @param obj the object to check
-     * @return true if no nulls are found, false otherwise
-     */
-    public static boolean hasNoNulls(Object obj) {
-        try {
-            assertNoNulls(obj);
-            return true;
-        } catch (NullsFoundException e) {
-            return false;
-        }
-    }
+
 
     private static boolean isPrimitiveOrWrapper(Class<?> clazz) {
         return clazz.isPrimitive()

@@ -19,27 +19,35 @@ public class VavrTypeValidator implements TypeValidator {
     @Override
     public void validate(Object obj, String path, Set<Integer> visited,
                          List<String> nullPaths, RecursiveValidator recursiveValidator) {
-        if (obj instanceof Map<?, ?> map) {
-            // Handle Vavr Map
-            int index = 0;
-            for (var entry : map) {
-                recursiveValidator.validate(entry._1(),
-                        path + ".key[" + index + "]", visited, nullPaths);
-                recursiveValidator.validate(entry._2(),
-                        path + "[" + entry._1() + "]", visited, nullPaths);
-                index++;
+        switch (obj) {
+            case Map<?, ?> map -> {
+                // Handle Vavr Map
+                int index = 0;
+                for (var entry : map) {
+                    recursiveValidator.validate(entry._1(),
+                            path + ".key[" + index + "]", visited, nullPaths);
+                    recursiveValidator.validate(entry._2(),
+                            path + "[" + entry._1() + "]", visited, nullPaths);
+                    index++;
+                }
             }
-        } else if (obj instanceof Traversable<?> traversable) {
-            // Handle other Vavr collections (List, Set, Stream, etc.)
-            int index = 0;
-            for (Object item : traversable) {
-                recursiveValidator.validate(item,
-                        path + "[" + index + "]", visited, nullPaths);
-                index++;
+            case Traversable<?> traversable -> {
+                // Handle other Vavr collections (List, Set, Stream, etc.)
+                int index = 0;
+                for (Object item : traversable) {
+                    recursiveValidator.validate(item,
+                            path + "[" + index + "]", visited, nullPaths);
+                    index++;
+                }
             }
-        } else if (obj instanceof Value<?> value) {
-            // Handle Vavr Value (Option, Try, etc.)
-            value.forEach(item -> recursiveValidator.validate(item, path, visited, nullPaths));
+            case Value<?> value ->
+                // Handle Vavr Value (Option, Try, etc.)
+                    value.forEach(item -> recursiveValidator.validate(item, path, visited, nullPaths));
+            default -> {
+                // shouldn't happen, we don't handle other types
+                // but this is the safe fallback
+                recursiveValidator.validate(obj, path, visited, nullPaths);
+            }
         }
     }
 }

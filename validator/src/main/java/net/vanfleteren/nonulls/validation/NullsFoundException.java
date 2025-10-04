@@ -2,7 +2,6 @@ package net.vanfleteren.nonulls.validation;
 
 import java.util.List;
 import java.util.Objects;
-
 /**
  * Exception thrown when one or more null values are found in an object graph.
  * Contains the list of paths where nulls were detected.

@@ -2,6 +2,8 @@ package net.vanfleteren.nonulls.validation;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class NullValidatorEdgeCasesTest {
@@ -20,7 +22,7 @@ class NullValidatorEdgeCasesTest {
 
     @Test
     void rootObjectNull_reportsRootPath() {
-        assertEquals(java.util.List.of("root"), NullValidator.findNullPaths(null));
+        assertEquals(List.of("root"), NullValidator.findNullPaths(null));
     }
 
     @Test
@@ -28,13 +30,13 @@ class NullValidatorEdgeCasesTest {
         SelfRef node = new SelfRef();
         node.self = node; // self-reference creates cycle
         
-        assertEquals(java.util.List.of(), NullValidator.findNullPaths(node));
+        assertEquals(List.of(), NullValidator.findNullPaths(node));
     }
 
     @Test
     void staticFields_areIgnored_evenWhenNull() {
         WithStatic ws = new WithStatic();
         
-        assertEquals(java.util.List.of(), NullValidator.findNullPaths(ws));
+        assertEquals(List.of(), NullValidator.findNullPaths(ws));
     }
 }
