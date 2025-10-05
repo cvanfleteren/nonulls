@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import java.util.Optional;
 public class EmptyAwareOptionalDeserializer extends JsonDeserializer<Optional<?>>
         implements ContextualDeserializer {
 
+    @Nullable
     private final JavaType valueType;
 
     public EmptyAwareOptionalDeserializer() {
@@ -23,7 +25,7 @@ public class EmptyAwareOptionalDeserializer extends JsonDeserializer<Optional<?>
     }
 
     @Override
-    public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property)
+    public JsonDeserializer<?> createContextual(DeserializationContext ctxt, @Nullable BeanProperty property)
             throws JsonMappingException {
         JavaType wrapperType = property != null ? property.getType() : ctxt.getContextualType();
         JavaType valueType = wrapperType.containedType(0);
