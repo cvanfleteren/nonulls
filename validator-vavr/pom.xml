@@ -9,7 +9,7 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>vavr-support</artifactId>
+    <artifactId>validator-vavr</artifactId>
     <name>NoNulls support for validating Vavr types</name>
     <description>Integration of NoNulls validator with Vavr collections and types.</description>
 
