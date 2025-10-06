@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Named.named;
 
 public class TreatNullCollectionsAsEmptyTest extends JacksonTest {
 
@@ -26,12 +29,17 @@ public class TreatNullCollectionsAsEmptyTest extends JacksonTest {
                 """;
 
         return Stream.of(
-                Arguments.of(Record.class, json),
-                Arguments.of(RecordWithCreator.class, json),
-                Arguments.of(NoSetters.class, json),
-                Arguments.of(JavaBean.class, json),
-                Arguments.of(PojoWithCreator.class, json)
+                Arguments.of(clazz(Record.class), named("json", json)),
+                Arguments.of(clazz(RecordWithCreator.class), named("json",json)),
+                Arguments.of(clazz(NoSetters.class), named("json",json)),
+                Arguments.of(clazz(JavaBean.class), named("json",json)),
+                Arguments.of(clazz(PojoWithCreator.class), named("json",json))
         );
+    }
+
+
+    static <T> Named<Class<T>> clazz(Class<T> clazz) {
+        return named(clazz.getSimpleName(), clazz);
     }
 
     @ParameterizedTest
