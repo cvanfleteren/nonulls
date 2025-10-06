@@ -28,8 +28,8 @@
         </developer>
     </developers>
     <modules>
-        <module>validator</module>
         <module>jackson2</module>
+        <module>validator</module>
         <module>validator-vavr</module>
     </modules>
     <scm>

@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.jackson2;
+package net.vanfleteren.nonulls.jackson2.api;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.module.SimpleDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import java.util.*;
+
+import net.vanfleteren.nonulls.jackson2.internal.*;
 
 public final class NoNullsModule extends SimpleModule {
 
@@ -84,6 +86,13 @@ public final class NoNullsModule extends SimpleModule {
             deserializers.addDeserializer(Optional.class, new EmptyAwareOptionalDeserializer());
         }
 
+        if (treatNullCollectionsAsEmpty) {
+            context.configOverride(Collection.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
+            context.configOverride(Iterable.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
+            context.configOverride(List.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
+            context.configOverride(Map.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
+            context.configOverride(Set.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
+        }
 
         if (filterNullInCollections) {
             // Configure to skip null contents for common collection types (not maps)
@@ -102,17 +111,10 @@ public final class NoNullsModule extends SimpleModule {
             context.addBeanDeserializerModifier(new FilteringCollectionsModifier(filterNullValuesInMaps));
         }
 
-        if (treatNullCollectionsAsEmpty) {
-            context.configOverride(Collection.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
-            context.configOverride(Iterable.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
-            context.configOverride(List.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
-            context.configOverride(Map.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
-            context.configOverride(Set.class).setSetterInfo(JsonSetter.Value.forValueNulls(Nulls.AS_EMPTY));
-        }
-
-        context.addDeserializers(deserializers);
         if (failOnNulls) {
             context.addBeanDeserializerModifier(new NullValidatingDeserializerModifier());
         }
+
+        context.addDeserializers(deserializers);
     }
 }

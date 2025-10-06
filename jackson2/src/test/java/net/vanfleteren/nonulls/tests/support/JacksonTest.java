@@ -1,8 +1,8 @@
-package net.vanfleteren.nonulls.jackson2.support;
+package net.vanfleteren.nonulls.tests.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import net.vanfleteren.nonulls.jackson2.NoNullsModule;
+import net.vanfleteren.nonulls.jackson2.api.NoNullsModule;
 import net.vanfleteren.nonulls.validation.NullValidator;
 
 import java.util.List;

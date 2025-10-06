@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.jackson2;
+package net.vanfleteren.nonulls.jackson2.internal;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
@@ -7,21 +7,21 @@ import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-final class NullFilteringSetDeserializer extends StdDeserializer<Set<?>>
+public final class NullFilteringListDeserializer extends StdDeserializer<List<?>>
         implements ContextualDeserializer {
 
     private final JavaType elementType;
 
-    public NullFilteringSetDeserializer() {
-        super(Set.class);
+    public NullFilteringListDeserializer() {
+        super(List.class);
         this.elementType = null;
     }
 
-    private NullFilteringSetDeserializer(JavaType elementType) {
-        super(Set.class);
+    private NullFilteringListDeserializer(JavaType elementType) {
+        super(List.class);
         this.elementType = elementType;
     }
 
@@ -30,12 +30,12 @@ final class NullFilteringSetDeserializer extends StdDeserializer<Set<?>>
             throws JsonMappingException {
         JavaType wrapperType = property != null ? property.getType() : ctxt.getContextualType();
         JavaType elementType = wrapperType.containedType(0);
-        return new NullFilteringSetDeserializer(elementType);
+        return new NullFilteringListDeserializer(elementType);
     }
 
     @Override
-    public Set<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        LinkedHashSet<Object> result = new LinkedHashSet<>();
+    public List<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+        List<Object> result = new ArrayList<>();
 
         if (p.getCurrentToken() != JsonToken.START_ARRAY) {
             ctxt.reportWrongTokenException(this, JsonToken.START_ARRAY,
@@ -74,7 +74,7 @@ final class NullFilteringSetDeserializer extends StdDeserializer<Set<?>>
     }
 
     @Override
-    public Set<?> getNullValue(DeserializationContext ctxt) {
-        return new LinkedHashSet<>();
+    public List<?> getNullValue(DeserializationContext ctxt) {
+        return new ArrayList<>();
     }
 }

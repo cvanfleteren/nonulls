@@ -1,10 +1,10 @@
-package net.vanfleteren.nonulls.jackson2.support;
+package net.vanfleteren.nonulls.tests.support;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import lombok.SneakyThrows;
-import net.vanfleteren.nonulls.jackson2.NoNullsModule;
+import net.vanfleteren.nonulls.jackson2.api.NoNullsModule;
 import org.assertj.core.api.Assertions;
 
 import java.util.function.Consumer;

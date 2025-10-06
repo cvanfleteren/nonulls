@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.jackson2;
+package net.vanfleteren.nonulls.jackson2.internal;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.MapType;
 
-final class FilteringCollectionsModifier extends com.fasterxml.jackson.databind.deser.BeanDeserializerModifier {
+public final class FilteringCollectionsModifier extends com.fasterxml.jackson.databind.deser.BeanDeserializerModifier {
 
     private final boolean filterNullValuesInMaps;
 
