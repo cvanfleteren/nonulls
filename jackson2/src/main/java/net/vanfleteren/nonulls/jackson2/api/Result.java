@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.jackson2;
+package net.vanfleteren.nonulls.jackson2.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import net.vanfleteren.nonulls.validation.NullsFoundException;
@@ -8,20 +8,10 @@ import java.util.Optional;
 /**
  * A Result object that can either be a Success or a Failure.
  * This is a convenient type to represent the result of a deserialization operation.
- * If you wrap the actual type that you except to read from the ObjectMapper in a Result, you'll always get a Success or a Failure, indicating what went wrong in the deserialization.
+ * If you wrap the actual type that you expect to read from the ObjectMapper in a Result, you'll always get a Success or a Failure, indicating what went wrong in the deserialization.
  * There are two main reasons for failures: invalid JSON or nulls found in the resulting graph.
- * <p>
- * So instead of <code>objectMapper.readValue(json, MyPojo.class)</code>, you can use something like this:
- * {@snippet :
-  Result<MyPojo> result = objectMapper.readValue(json, new TypeReference(){})
-  switch(result) {
-     case Success<MyPojo> s -> s.value() // do something with the result
-     case Failure<MyPojo> f -> {} // handle failure
-  }
- * }
  *
- *
- * @param <T>
+ * @param <T> contained value type
  */
 public sealed interface Result<T> {
 

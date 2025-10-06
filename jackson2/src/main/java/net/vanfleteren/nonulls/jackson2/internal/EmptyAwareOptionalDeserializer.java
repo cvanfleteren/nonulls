@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.jackson2;
+package net.vanfleteren.nonulls.jackson2.internal;
 
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -10,7 +10,7 @@ import org.jspecify.annotations.Nullable;
 import java.io.IOException;
 import java.util.Optional;
 
-final class EmptyAwareOptionalDeserializer extends JsonDeserializer<Optional<?>>
+public final class EmptyAwareOptionalDeserializer extends JsonDeserializer<Optional<?>>
         implements ContextualDeserializer {
 
     @Nullable

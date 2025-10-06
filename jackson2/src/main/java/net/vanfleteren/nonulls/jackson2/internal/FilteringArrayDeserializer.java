@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.jackson2;
+package net.vanfleteren.nonulls.jackson2.internal;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.BeanProperty;
@@ -11,8 +11,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-
-final class FilteringArrayDeserializer extends JsonDeserializer<Object> implements ContextualDeserializer {
+public final class FilteringArrayDeserializer extends JsonDeserializer<Object> implements ContextualDeserializer {
     private final JsonDeserializer<Object> delegate;
     private final boolean skipEmptyStrings;
 

@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.jackson2;
+package net.vanfleteren.nonulls.jackson2.internal;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -11,7 +11,7 @@ import net.vanfleteren.nonulls.validation.NullsFoundException;
 
 import java.io.IOException;
 
-final class NullValidatingDeserializer<T> extends StdDeserializer<T> implements ResolvableDeserializer {
+public final class NullValidatingDeserializer<T> extends StdDeserializer<T> implements ResolvableDeserializer {
 
     private final JsonDeserializer<T> defaultDeserializer;
 

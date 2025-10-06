@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.jackson2;
+package net.vanfleteren.nonulls.jackson2.internal;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import net.vanfleteren.nonulls.jackson2.api.Result;
 import net.vanfleteren.nonulls.validation.NullValidator;
 import net.vanfleteren.nonulls.validation.NullsFoundException;
 import org.jspecify.annotations.Nullable;
@@ -14,10 +15,10 @@ import java.io.IOException;
 
 /**
  * Deserializer for Result objects.
- * Will deserialize excepted values and wrap them in a Result.InvalidJson or Result.NullsFound object if there is invalid JSON or nulls found.
+ * Will deserialize expected values and wrap them in a Result.InvalidJson or Result.NullsFound object if there is invalid JSON or nulls found.
  * @param <T> The type of the contained value.
  */
-final class ResultDeserializer<T> extends StdDeserializer<Result<T>> implements ContextualDeserializer {
+public final class ResultDeserializer<T> extends StdDeserializer<Result<T>> implements ContextualDeserializer {
 
     @Nullable
     private final JavaType elementType;

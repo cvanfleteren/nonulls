@@ -1,9 +1,10 @@
-package net.vanfleteren.nonulls.jackson2;
+package net.vanfleteren.nonulls.tests;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import net.vanfleteren.nonulls.jackson2.support.JacksonTest;
+import net.vanfleteren.nonulls.jackson2.api.Result;
+import net.vanfleteren.nonulls.tests.support.JacksonTest;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullUnmarked;
 import org.junit.jupiter.api.Test;
