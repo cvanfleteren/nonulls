@@ -78,6 +78,7 @@ public final class NoNullsModule extends SimpleModule {
     public void setupModule(SetupContext context) {
         super.setupModule(context);
         SimpleDeserializers deserializers = new SimpleDeserializers();
+        deserializers.addDeserializer(Result.class, new ResultDeserializer<>());
 
         if (emptyAwareOptional) {
             deserializers.addDeserializer(Optional.class, new EmptyAwareOptionalDeserializer());
@@ -86,7 +87,6 @@ public final class NoNullsModule extends SimpleModule {
 
         if (filterNullInCollections) {
             // Configure to skip null contents for common collection types (not maps)
-            context.configOverride(Collection.class).setSetterInfo(JsonSetter.Value.forContentNulls(Nulls.SKIP));
             context.configOverride(Collection.class).setSetterInfo(JsonSetter.Value.forContentNulls(Nulls.SKIP));
             context.configOverride(Iterable.class).setSetterInfo(JsonSetter.Value.forContentNulls(Nulls.SKIP));
             context.configOverride(List.class).setSetterInfo(JsonSetter.Value.forContentNulls(Nulls.SKIP));

@@ -11,7 +11,7 @@ import net.vanfleteren.nonulls.validation.NullsFoundException;
 
 import java.io.IOException;
 
-public class NullValidatingDeserializer<T> extends StdDeserializer<T> implements ResolvableDeserializer {
+final class NullValidatingDeserializer<T> extends StdDeserializer<T> implements ResolvableDeserializer {
 
     private final JsonDeserializer<T> defaultDeserializer;
 

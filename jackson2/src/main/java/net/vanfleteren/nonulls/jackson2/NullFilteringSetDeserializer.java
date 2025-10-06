@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class NullFilteringSetDeserializer extends StdDeserializer<Set<?>>
+final class NullFilteringSetDeserializer extends StdDeserializer<Set<?>>
         implements ContextualDeserializer {
 
     private final JavaType elementType;

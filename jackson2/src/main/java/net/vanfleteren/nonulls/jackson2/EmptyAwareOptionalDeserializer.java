@@ -10,7 +10,7 @@ import org.jspecify.annotations.Nullable;
 import java.io.IOException;
 import java.util.Optional;
 
-public class EmptyAwareOptionalDeserializer extends JsonDeserializer<Optional<?>>
+final class EmptyAwareOptionalDeserializer extends JsonDeserializer<Optional<?>>
         implements ContextualDeserializer {
 
     @Nullable

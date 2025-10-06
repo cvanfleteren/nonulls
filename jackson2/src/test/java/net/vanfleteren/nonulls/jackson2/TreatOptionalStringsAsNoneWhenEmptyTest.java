@@ -1,5 +1,6 @@
 package net.vanfleteren.nonulls.jackson2;
 
+import net.vanfleteren.nonulls.jackson2.support.JacksonTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;

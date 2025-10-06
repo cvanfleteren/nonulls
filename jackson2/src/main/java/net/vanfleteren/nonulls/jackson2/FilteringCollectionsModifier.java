@@ -7,9 +7,8 @@ import com.fasterxml.jackson.databind.type.ArrayType;
 import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.MapType;
-import lombok.RequiredArgsConstructor;
 
-public final class FilteringCollectionsModifier extends com.fasterxml.jackson.databind.deser.BeanDeserializerModifier {
+final class FilteringCollectionsModifier extends com.fasterxml.jackson.databind.deser.BeanDeserializerModifier {
 
     private final boolean filterNullValuesInMaps;
 

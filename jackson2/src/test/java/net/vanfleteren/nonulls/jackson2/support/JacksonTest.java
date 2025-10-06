@@ -1,29 +1,34 @@
-package net.vanfleteren.nonulls.jackson2;
+package net.vanfleteren.nonulls.jackson2.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import net.vanfleteren.nonulls.jackson2.NoNullsModule;
 import net.vanfleteren.nonulls.validation.NullValidator;
 
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-abstract class JacksonTest {
+public class JacksonTest {
 
     // these two should be functionally the same
-    ObjectMapper defaultJacksonMapper = new ObjectMapper().findAndRegisterModules();
-    ObjectMapper noNullDisabled = new ObjectMapper().findAndRegisterModules().registerModule(new NoNullsModule.Builder().disableAll().build());
+    protected ObjectMapper defaultJacksonMapper = new ObjectMapper().findAndRegisterModules();
+    protected ObjectMapper noNullDisabled = new ObjectMapper().findAndRegisterModules().registerModule(new NoNullsModule.Builder().disableAll().build());
 
     // this is the behaviour we really want :)
-    ObjectMapper noNullDefault = new ObjectMapper().registerModule(buildNoNullsModule());
+    protected ObjectMapper noNullDefault = new ObjectMapper().registerModule(buildNoNullsModule());
+
+    protected NoNullsModule.Builder noNullsBuilder() {
+        return new NoNullsModule.Builder();
+    };
 
 
-    NoNullsModule buildNoNullsModule() {
+    protected NoNullsModule buildNoNullsModule() {
         return new NoNullsModule.Builder().build();
     }
 
     @SneakyThrows
-    <T> void assertDefaultHasNullsAt(String json, Class<T> type, String... expectedNullPaths) {
+    public <T> void assertDefaultHasNullsAt(String json, Class<T> type, String... expectedNullPaths) {
 
         {
             T value = defaultJacksonMapper.readValue(json, type);
@@ -41,7 +46,7 @@ abstract class JacksonTest {
     }
 
     @SneakyThrows
-    <T> T assertNoNullsHasNoNulls(String json, Class<T> type)  {
+    public <T> T assertNoNullsHasNoNulls(String json, Class<T> type)  {
         T value = noNullDefault.readValue(json, type);
         List<String> nullPaths = NullValidator.findNullPaths(value);
 
@@ -51,7 +56,7 @@ abstract class JacksonTest {
     }
 
     @SneakyThrows
-    <T> void assertNoNullsHasNullsAt(String json, Class<T> type, String... expectedNullPaths) {
+    public <T> void assertNoNullsHasNullsAt(String json, Class<T> type, String... expectedNullPaths) {
 
         {
             T value = defaultJacksonMapper.readValue(json, type);

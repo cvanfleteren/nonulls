@@ -36,11 +36,13 @@ public class NullValidator {
      * @param obj the object to validate
      * @throws NullsFoundException if any null value is found in the object graph
      */
-    public static void assertNoNulls(@Nullable Object obj) throws NullsFoundException {
+    public static <T> T assertNoNulls(@Nullable T obj) throws NullsFoundException {
         List<String> nullPaths = findNullPaths(obj);
         if (!nullPaths.isEmpty()) {
             throw new NullsFoundException(nullPaths);
         }
+        assert obj != null;
+        return obj;
     }
 
     /**

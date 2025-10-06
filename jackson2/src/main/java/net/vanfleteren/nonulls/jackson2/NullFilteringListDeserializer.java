@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NullFilteringListDeserializer extends StdDeserializer<List<?>>
+final class NullFilteringListDeserializer extends StdDeserializer<List<?>>
         implements ContextualDeserializer {
 
     private final JavaType elementType;
