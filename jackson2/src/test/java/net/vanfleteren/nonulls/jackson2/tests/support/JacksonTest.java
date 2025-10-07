@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.tests.support;
+package net.vanfleteren.nonulls.jackson2.tests.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;

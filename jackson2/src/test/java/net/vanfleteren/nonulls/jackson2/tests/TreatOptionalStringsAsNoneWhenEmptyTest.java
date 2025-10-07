@@ -1,6 +1,6 @@
-package net.vanfleteren.nonulls.tests;
+package net.vanfleteren.nonulls.jackson2.tests;
 
-import net.vanfleteren.nonulls.tests.support.JacksonTest;
+import net.vanfleteren.nonulls.jackson2.tests.support.JacksonTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;

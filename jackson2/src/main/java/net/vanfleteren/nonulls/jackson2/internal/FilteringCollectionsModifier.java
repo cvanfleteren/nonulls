@@ -39,7 +39,8 @@ public final class FilteringCollectionsModifier extends com.fasterxml.jackson.da
                                                        ArrayType type,
                                                        BeanDescription beanDesc,
                                                        JsonDeserializer<?> deserializer) {
-        return new FilteringArrayDeserializer((JsonDeserializer<Object>) deserializer);
+        Class<?> componentClass = type.getContentType().getRawClass();
+        return new FilteringArrayDeserializer((JsonDeserializer<Object>) deserializer, componentClass);
     }
 
     private static final class FilteringCollectionDeserializer extends JsonDeserializer<Object> implements ContextualDeserializer {
@@ -93,14 +94,18 @@ public final class FilteringCollectionsModifier extends com.fasterxml.jackson.da
     private static final class FilteringArrayDeserializer extends JsonDeserializer<Object> implements ContextualDeserializer {
         private final JsonDeserializer<Object> delegate;
         private final boolean skipEmptyStrings;
+        private final Class<?> componentClass;
 
-        FilteringArrayDeserializer(JsonDeserializer<Object> delegate) { this(delegate, true); }
-        FilteringArrayDeserializer(JsonDeserializer<Object> delegate, boolean skipEmptyStrings) {
-            this.delegate = delegate; this.skipEmptyStrings = skipEmptyStrings; }
+        FilteringArrayDeserializer(JsonDeserializer<Object> delegate, Class<?> componentClass) { this(delegate, componentClass, true); }
+        FilteringArrayDeserializer(JsonDeserializer<Object> delegate, Class<?> componentClass, boolean skipEmptyStrings) {
+            this.delegate = delegate; this.componentClass = componentClass; this.skipEmptyStrings = skipEmptyStrings; }
 
         @Override
         public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             Object arr = delegate.deserialize(p, ctxt);
+            if (arr == null) {
+                return Array.newInstance(componentClass, 0);
+            }
             if (!arr.getClass().isArray()) return arr;
             int len = Array.getLength(arr);
             ArrayList<Object> tmp = new ArrayList<>(len);
@@ -110,9 +115,7 @@ public final class FilteringCollectionsModifier extends com.fasterxml.jackson.da
                     tmp.add(e);
                 }
             }
-            Object newArr = Array.newInstance(arr.getClass().getComponentType(), tmp.size());
-            for (int i = 0; i < tmp.size(); i++) Array.set(newArr, i, tmp.get(i));
-            return newArr;
+            return tmp.toArray((Object[])Array.newInstance(arr.getClass().getComponentType(), tmp.size()));
         }
 
         @Override
@@ -121,7 +124,12 @@ public final class FilteringCollectionsModifier extends com.fasterxml.jackson.da
             if (delegate instanceof ContextualDeserializer cd) {
                 ctxd = cd.createContextual(ctxt, property);
             }
-            return new FilteringArrayDeserializer((JsonDeserializer<Object>) ctxd, skipEmptyStrings);
+            return new FilteringArrayDeserializer((JsonDeserializer<Object>) ctxd, componentClass, skipEmptyStrings);
+        }
+
+        @Override
+        public Object getNullValue(DeserializationContext ctxt) throws JsonMappingException {
+            return Array.newInstance(componentClass, 0);
         }
     }
 }
