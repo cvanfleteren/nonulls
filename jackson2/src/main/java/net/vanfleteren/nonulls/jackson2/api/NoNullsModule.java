@@ -45,7 +45,7 @@ public final class NoNullsModule extends SimpleModule {
         }
 
         public Builder disableAll() {
-            this.filterNullsInCollections = this.treatNullCollectionsAsEmpty = this.emptyAwareOptional = false;
+            this.filterNullsInCollections = this.filterNullValuesInMaps = this.treatNullCollectionsAsEmpty = this.emptyAwareOptional = false;
             return this;
         }
 
@@ -106,9 +106,14 @@ public final class NoNullsModule extends SimpleModule {
             // where Jackson may not apply config overrides consistently.
             deserializers.addDeserializer(List.class, new NullFilteringListDeserializer());
             deserializers.addDeserializer(Set.class, new NullFilteringSetDeserializer());
-            deserializers.addDeserializer(Map.class, new NullFilteringMapDeserializer());
 
-            context.addBeanDeserializerModifier(new FilteringCollectionsModifier(filterNullValuesInMaps));
+            context.addBeanDeserializerModifier(new FilteringCollectionsModifier());
+        }
+
+        if(filterNullValuesInMaps) {
+            deserializers.addDeserializer(Map.class, new NullFilteringMapDeserializer());
+            // this one works for concrete types
+            context.addBeanDeserializerModifier(new FilteringMapModifier());
         }
 
         if (failOnNulls) {

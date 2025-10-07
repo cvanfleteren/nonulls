@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public final class NullFilteringMapDeserializer extends StdDeserializer<Map<?, ?>>
         implements ContextualDeserializer {
@@ -53,10 +54,10 @@ public final class NullFilteringMapDeserializer extends StdDeserializer<Map<?, ?
             String fieldName = p.getCurrentName();
             p.nextToken();
 
-            if (p.getCurrentToken() == JsonToken.VALUE_NULL) {
+            if (p.getCurrentToken() == JsonToken.VALUE_NULL && valueType.getRawClass() != Optional.class) {
                 continue; // skip null values entirely
             }
-            if (p.getCurrentToken() == JsonToken.VALUE_STRING) {
+            if (p.getCurrentToken() == JsonToken.VALUE_STRING && valueType.getRawClass() != Optional.class) {
                 String val = p.getValueAsString();
                 if (val == null || val.isBlank()) {
                     continue; // skip empty/blank strings

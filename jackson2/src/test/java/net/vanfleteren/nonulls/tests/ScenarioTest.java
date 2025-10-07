@@ -45,15 +45,12 @@ public class ScenarioTest extends JacksonTest {
     }
 
     @Test
-    @Disabled("broken")
     void scenarioTest3() {
+        record Data(Map<String, Optional<String>> optMap) {
+        }
+
         assertThatJson("""
                 {
-                    "s":"s",
-                    "optional":null,
-                    "list":null,
-                    "set":null,
-                    "map":null,
                     "optMap": {
                         "key1": "",
                         "key2": null,
@@ -63,11 +60,6 @@ public class ScenarioTest extends JacksonTest {
                 """
         ).deserializesInto(
                 new Data(
-                        "s",
-                        empty(),
-                        List.of(),
-                        Set.of(),
-                        Map.of(),
                         Map.of(
                                 "key1", empty(),
                                 "key2", empty(),
@@ -78,19 +70,35 @@ public class ScenarioTest extends JacksonTest {
     }
 
     @Test
-    @Disabled("broken")
     void scenarioTest4() {
+        record Data(Map<String, Integer> map) {
+        }
+
         assertThatJson("""
                 {
-                    "s":"s",
-                    "optional":null,
-                    "list":["1", null],
-                    "set":[null, "1"],
                     "map": {
-                        "key1": "",
+                        "key1": 1,
                         "key2": null,
-                        "key3": "3"
-                    },
+                        "key3": 3
+                    }
+                }
+                """
+        ).using(b -> b.filterNullValuesInMaps(false))
+        .deserializesInto(
+                new Data(
+                        mutableMapOf("key3", 3, "key2", null, "key1", 1)
+                )
+        );
+    }
+
+    @Test
+    void scenarioTest5() {
+
+        record Data(Map<String, Optional<String>> optMap) {
+        }
+
+        assertThatJson("""
+                {
                     "optMap": {
                         "opt1": null,
                         "opt2": "",
@@ -98,17 +106,20 @@ public class ScenarioTest extends JacksonTest {
                     }
                 }
                 """
-        ).using(b -> b.filterNullValuesInMaps(true).filterNullsInCollections(true))
-        .deserializesInto(
-                new Data(
-                        "s",
-                        empty(),
-                        List.of("1"),
-                        Set.of("1"),
-                        Map.of("key3", 3),
-                        Map.of("opt1", empty(), "opt2", empty(), "opt3", of("opt3"))
-                )
-        );
+        ).using(b -> b.disableAll().emptyAwareOptional(true).filterNullsInCollections(true))
+                .deserializesInto(
+                        new Data(
+                                Map.of("opt1", empty(), "opt2", empty(), "opt3", of("opt3"))
+                        )
+                );
+    }
+
+    private <K,V> Map<K,V> mutableMapOf(Object... entries) {
+        Map<K,V> map = new HashMap<>();
+        for (int i = 0; i < entries.length; i += 2) {
+            map.put((K)entries[i], (V)entries[i+1]);
+        }
+        return map;
     }
 
 }
