@@ -10,15 +10,16 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 public class TreatOptionalStringsAsNoneWhenEmptyTest extends JacksonTest {
 
     @Test
-    void treat_optionalEmptyStrings_asOptionalEmpty() throws Exception {
+    void treat_optionalBlankStrings_asOptionalEmpty() throws Exception {
 
-        record Data(Optional<String> string, Optional<String> string2) {
+        record Data(Optional<String> string, Optional<String> string2, Optional<String> string3) {
         }
 
         String json = """
                 {
                     "string": null,
-                    "string2": ""
+                    "string2": "",
+                    "string3": "  "
                 }
                 """;
 
@@ -28,6 +29,7 @@ public class TreatOptionalStringsAsNoneWhenEmptyTest extends JacksonTest {
 
             assertThat(jackson.string).isEmpty();
             assertThat(jackson.string2).contains("");
+            assertThat(jackson.string3).contains("  ");
 
             assertThat(jackson).isEqualTo(noNullsDisabled);
         }
@@ -38,6 +40,7 @@ public class TreatOptionalStringsAsNoneWhenEmptyTest extends JacksonTest {
             // instead of an Optional.of("") we get an Optional.empty() with noNulls
             assertThat(noNulls.string).isEmpty();
             assertThat(noNulls.string2).isEmpty();
+            assertThat(noNulls.string3).isEmpty();
         }
 
     }

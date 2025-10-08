@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-public class JacksonTest {
+public abstract class JacksonTest {
 
     // these two should be functionally the same
     protected ObjectMapper defaultJacksonMapper = new ObjectMapper().findAndRegisterModules();

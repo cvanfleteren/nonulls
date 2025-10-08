@@ -38,7 +38,7 @@ public class JsonAssert {
         this.typeReference = typeReference;
         return this;
     }
-
+    
     @SneakyThrows
     public void deserializesInto(Object expected) {
         if(typeReference != null) {

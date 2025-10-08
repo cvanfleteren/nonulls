@@ -15,27 +15,45 @@ import java.util.Optional;
  */
 public sealed interface Result<T> {
 
+    /**
+     * A Success Result with the given value.
+     */
     static <T> Result<T> success(T value) {
         return new Success<>(value);
     }
 
+    /**
+     * A Failure because of invalid JSON.
+     */
     static <T> Result<T> invalidJson(JsonProcessingException exception) {
         return new InvalidJson<>(exception);
     }
 
+    /**
+     * A Failure because of nulls found in the resulting graph.
+     */
     static <T> Result<T> nullsFound(NullsFoundException exception) {
         return new NullsFound<>(exception);
     }
 
+    /**
+     * Returns true if this is a Success.
+     */
     default boolean isSuccess() {
         return this instanceof Success;
     }
 
+    /**
+     * Returns true if this is a Failure.
+     */
     default boolean isFailure() {
         return this instanceof Failure;
     }
 
-    default Optional<T> get() {
+    /**
+     * Returns the contained value if this is a Success, or an empty Optional if this is a Failure.
+     */
+    default Optional<T> toOptional() {
         return switch (this) {
             case Success<T> s -> Optional.of(s.value());
             case Failure<T> f -> Optional.empty();

@@ -2,13 +2,13 @@ package net.vanfleteren.nonulls.jackson2.tests;
 
 import com.fasterxml.jackson.annotation.JsonMerge;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.vanfleteren.nonulls.jackson2.tests.support.JacksonTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -140,39 +140,44 @@ public class ScenarioTest extends JacksonTest {
                 );
     }
 
-
     @lombok.Data
     @NoArgsConstructor
-    static class Data2 {
+    static class Scenario6 {
         @JsonMerge
-        @JsonProperty("map")
         final ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();
-
         {
             map.put("key1", 1);
+        }
+
+        @JsonMerge
+        final Queue<String> list = new LinkedList<>();
+        {
+            list.add("a");
         }
     }
 
     @Test
     void scenarioTest6() {
-
-
-        Data2 expected = new Data2();
+        Scenario6 expected = new Scenario6();
         expected.map.put("key1", 1);
         expected.map.put("key3", 3);
+        expected.list.add("b");
 
         assertThatJson("""
                 {
                     "map": {
                         "key3": 3
-                    }
+                    },
+                    "list": ["b"]
                 }
                 """
         )
-        .deserializesInto(
-                expected
-        );
+                .deserializesInto(
+                        expected
+                );
     }
+
+
 
     @SuppressWarnings("unchecked")
     private <K, V> Map<K, V> mutableMapOf(Object... entries) {

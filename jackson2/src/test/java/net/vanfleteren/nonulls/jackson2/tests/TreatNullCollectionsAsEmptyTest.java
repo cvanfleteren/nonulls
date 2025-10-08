@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.vanfleteren.nonulls.jackson2.tests.support.JacksonTest;
 import org.junit.jupiter.api.Named;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -18,6 +19,24 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Named.named;
 
 public class TreatNullCollectionsAsEmptyTest extends JacksonTest {
+
+
+    static <T> Named<Class<T>> clazz(Class<T> clazz) {
+        return named(clazz.getSimpleName(), clazz);
+    }
+
+    @Test
+    void foo() {
+
+    }
+
+    @ParameterizedTest
+    @MethodSource("provider")
+    void test_for_nulls(Class<?> clazz, String json) {
+
+        assertDefaultHasNullsAt(json, clazz, "root.list", "root.map", "root.set", "root.nestedList[0]");
+        assertNoNullsHasNoNulls(json, clazz);
+    }
 
     private static Stream<Arguments> provider() {
         String json = """
@@ -36,20 +55,6 @@ public class TreatNullCollectionsAsEmptyTest extends JacksonTest {
                 Arguments.of(clazz(JavaBean.class), named("json",json)),
                 Arguments.of(clazz(PojoWithCreator.class), named("json",json))
         );
-    }
-
-
-    static <T> Named<Class<T>> clazz(Class<T> clazz) {
-        return named(clazz.getSimpleName(), clazz);
-    }
-
-    @ParameterizedTest
-    @MethodSource("provider")
-    <T> void test_for_nulls(Class<T> clazz, String json) {
-
-        assertDefaultHasNullsAt(json, clazz, "root.list", "root.map", "root.set", "root.nestedList[0]");
-        assertNoNullsHasNoNulls(json, clazz);
-
     }
 
     record Record(List<String> list, Map<String, String> map, Set<Integer> set, List<List<String>> nestedList) {
