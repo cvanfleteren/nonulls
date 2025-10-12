@@ -1,14 +1,12 @@
 package net.vanfleteren.nonulls.jackson2.tests;
 
 import com.fasterxml.jackson.annotation.JsonMerge;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NoArgsConstructor;
 import net.vanfleteren.nonulls.jackson2.tests.support.JacksonTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;

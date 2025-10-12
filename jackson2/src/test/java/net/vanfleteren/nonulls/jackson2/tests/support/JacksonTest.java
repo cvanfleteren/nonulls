@@ -3,7 +3,7 @@ package net.vanfleteren.nonulls.jackson2.tests.support;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import net.vanfleteren.nonulls.jackson2.api.NoNullsModule;
-import net.vanfleteren.nonulls.validation.NullValidator;
+import net.vanfleteren.nonulls.validator.NullValidator;
 
 import java.util.List;
 

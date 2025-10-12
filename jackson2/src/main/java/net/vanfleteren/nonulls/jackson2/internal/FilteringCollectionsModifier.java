@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.type.ArrayType;
 import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.MapType;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -77,7 +78,7 @@ public final class FilteringCollectionsModifier extends com.fasterxml.jackson.da
         }
 
         @Override
-        public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property) throws JsonMappingException {
+        public JsonDeserializer<?> createContextual(DeserializationContext ctxt, @Nullable BeanProperty property) throws JsonMappingException {
             JsonDeserializer<?> ctxd = delegate;
             if (delegate instanceof ContextualDeserializer cd) {
                 ctxd = cd.createContextual(ctxt, property);
@@ -119,7 +120,7 @@ public final class FilteringCollectionsModifier extends com.fasterxml.jackson.da
         }
 
         @Override
-        public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property) throws JsonMappingException {
+        public JsonDeserializer<?> createContextual(DeserializationContext ctxt, @Nullable BeanProperty property) throws JsonMappingException {
             JsonDeserializer<?> ctxd = delegate;
             if (delegate instanceof ContextualDeserializer cd) {
                 ctxd = cd.createContextual(ctxt, property);

@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.validation.vavr;
+package net.vanfleteren.nonulls.validator.vavr;
 
 import io.vavr.collection.List;
 

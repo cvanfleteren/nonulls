@@ -1,27 +1,32 @@
-package net.vanfleteren.nonulls.validation.vavr.spi;
+package net.vanfleteren.nonulls.validator.vavr.spi;
 
 import io.vavr.Value;
 import io.vavr.collection.Map;
 import io.vavr.collection.Traversable;
-import net.vanfleteren.nonulls.validation.spi.RecursiveValidator;
-import net.vanfleteren.nonulls.validation.spi.TypeValidator;
+import net.vanfleteren.nonulls.validator.spi.RecursiveValidator;
+import net.vanfleteren.nonulls.validator.spi.TypeValidator;
 
 import java.util.List;
 import java.util.Set;
 
 public class VavrTypeValidator implements TypeValidator {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean canHandle(Class<?> clazz) {
         return Traversable.class.isAssignableFrom(clazz) || Value.class.isAssignableFrom(clazz);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void validate(Object obj, String path, Set<Integer> visited,
-                         List<String> nullPaths, RecursiveValidator recursiveValidator) {
+    public void validate(Object obj, String path, Set<Integer> visited, List<String> nullPaths, RecursiveValidator recursiveValidator) {
         switch (obj) {
-            case Map<?, ?> map -> {
-                // Handle Vavr Map
+            // Handle Vavr Map
+            case Map<?, ?> map -> { // Vavr Map is a special kind of Traversable
                 int index = 0;
                 for (var entry : map) {
                     recursiveValidator.validate(entry._1(),
@@ -31,8 +36,9 @@ public class VavrTypeValidator implements TypeValidator {
                     index++;
                 }
             }
+            // Handle other Vavr collections (List, Set, Stream, etc.)
             case Traversable<?> traversable -> {
-                // Handle other Vavr collections (List, Set, Stream, etc.)
+
                 int index = 0;
                 for (Object item : traversable) {
                     recursiveValidator.validate(item,
@@ -40,9 +46,8 @@ public class VavrTypeValidator implements TypeValidator {
                     index++;
                 }
             }
-            case Value<?> value ->
-                // Handle Vavr Value (Option, Try, etc.)
-                    value.forEach(item -> recursiveValidator.validate(item, path, visited, nullPaths));
+            // Handle Vavr Value (Option, Try, etc.)
+            case Value<?> value -> value.forEach(item -> recursiveValidator.validate(item, path, visited, nullPaths));
             default -> {
                 // shouldn't happen, we don't handle other types
                 // but this is the safe fallback

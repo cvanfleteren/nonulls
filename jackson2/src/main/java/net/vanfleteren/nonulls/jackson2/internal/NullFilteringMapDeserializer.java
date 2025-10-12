@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -28,7 +29,7 @@ public final class NullFilteringMapDeserializer extends StdDeserializer<Map<?, ?
     }
 
     @Override
-    public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property)
+    public JsonDeserializer<?> createContextual(DeserializationContext ctxt, @Nullable BeanProperty property)
             throws JsonMappingException {
         JavaType wrapperType = property != null ? property.getType() : ctxt.getContextualType();
         JavaType valueType = wrapperType.containedType(1);

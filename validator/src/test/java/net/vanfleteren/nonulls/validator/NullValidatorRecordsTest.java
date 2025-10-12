@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.validation;
+package net.vanfleteren.nonulls.validator;
 
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ class NullValidatorRecordsTest {
     void optionalEmpty_isAllowed() {
         Optional<String> empty = Optional.empty();
         
-        assertEquals(java.util.List.of(), NullValidator.findNullPaths(empty));
+        assertEquals(List.of(), NullValidator.findNullPaths(empty));
     }
 
     @Test
@@ -46,7 +46,7 @@ class NullValidatorRecordsTest {
     void recordOptional_emptyIsAllowed() {
         OptionalHolder holder = new OptionalHolder(Optional.empty());
         
-        assertEquals(java.util.List.of(), NullValidator.findNullPaths(holder));
+        assertEquals(List.of(), NullValidator.findNullPaths(holder));
     }
 
     @Test
@@ -60,7 +60,7 @@ class NullValidatorRecordsTest {
     void recordOptional_presentInnerWithoutNulls_passes() {
         OptionalHolder holder = new OptionalHolder(Optional.of(new Inner("inner")));
         
-        assertEquals(java.util.List.of(), NullValidator.findNullPaths(holder));
+        assertEquals(List.of(), NullValidator.findNullPaths(holder));
     }
 
     @Test

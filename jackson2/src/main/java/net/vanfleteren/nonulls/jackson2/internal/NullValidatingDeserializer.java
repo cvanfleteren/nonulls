@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.ResolvableDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import net.vanfleteren.nonulls.validation.NullValidator;
-import net.vanfleteren.nonulls.validation.NullsFoundException;
+import net.vanfleteren.nonulls.validator.NullValidator;
+import net.vanfleteren.nonulls.validator.NullsFoundException;
 
 import java.io.IOException;
 

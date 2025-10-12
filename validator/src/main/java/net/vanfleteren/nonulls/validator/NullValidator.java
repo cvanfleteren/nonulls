@@ -1,7 +1,7 @@
-package net.vanfleteren.nonulls.validation;
+package net.vanfleteren.nonulls.validator;
 
-import net.vanfleteren.nonulls.validation.spi.RecursiveValidator;
-import net.vanfleteren.nonulls.validation.spi.TypeValidator;
+import net.vanfleteren.nonulls.validator.spi.RecursiveValidator;
+import net.vanfleteren.nonulls.validator.spi.TypeValidator;
 import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Array;

@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.validation.spi;
+package net.vanfleteren.nonulls.validator.spi;
 
 import org.jspecify.annotations.Nullable;
 

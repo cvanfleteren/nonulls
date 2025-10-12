@@ -1,7 +1,7 @@
 package net.vanfleteren.nonulls.jackson2.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import net.vanfleteren.nonulls.validation.NullsFoundException;
+import net.vanfleteren.nonulls.validator.NullsFoundException;
 
 import java.util.Optional;
 

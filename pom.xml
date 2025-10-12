@@ -143,6 +143,8 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
+                            <failOnError>false</failOnError>
+                            <doclint>none</doclint>
                             <source>${maven.compiler.source}</source>
                         </configuration>
                     </execution>

@@ -1,4 +1,4 @@
-package net.vanfleteren.nonulls.validation;
+package net.vanfleteren.nonulls.validator;
 
 import org.junit.jupiter.api.Test;
 

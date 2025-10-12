@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import net.vanfleteren.nonulls.jackson2.api.Result;
-import net.vanfleteren.nonulls.validation.NullValidator;
-import net.vanfleteren.nonulls.validation.NullsFoundException;
+import net.vanfleteren.nonulls.validator.NullValidator;
+import net.vanfleteren.nonulls.validator.NullsFoundException;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
