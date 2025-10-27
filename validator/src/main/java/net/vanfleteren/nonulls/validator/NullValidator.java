@@ -151,6 +151,12 @@ public class NullValidator {
                 return;
             }
 
+            // no need to recurse into these, jdk classes are fine if they arte not null themselves, no need to look in their innards
+            case Object object when object.getClass().getName().startsWith("java") -> {
+                return;
+            }
+
+            // no need to recurse into these
             case Enum<?> enumeration -> {
                 return;
             }
