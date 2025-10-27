@@ -81,6 +81,13 @@ public class NullValidator {
             return;
         }
 
+        Class<?> clazz = obj.getClass();
+
+        // Handle primitives and their wrappers - no further inspection needed
+        if (clazz == String.class || isPrimitiveOrWrapper(clazz)) {
+            return;
+        }
+
         // Avoid infinite recursion for circular references
         int identityHash = System.identityHashCode(obj);
         if (visited.contains(identityHash)) {
@@ -88,12 +95,7 @@ public class NullValidator {
         }
         visited.add(identityHash);
 
-        Class<?> clazz = obj.getClass();
 
-        // Handle primitives and their wrappers - no further inspection needed
-        if (isPrimitiveOrWrapper(clazz) || clazz == String.class) {
-            return;
-        }
 
         // Check custom validators first
         for (TypeValidator validator : CUSTOM_VALIDATORS) {
@@ -105,46 +107,27 @@ public class NullValidator {
         }
 
         switch (obj) {
-            case Optional<?> optional -> {
-                optional.ifPresent(value -> collectNullPaths(value, path, visited, nullPaths));
-                return;
-            }
+            case Optional<?> optional -> optional.ifPresent(value -> collectNullPaths(value, path, visited, nullPaths));
 
-            case Collection<?> collection -> {
-                recurseIntoCollection(path, visited, nullPaths, collection);
-                return;
-            }
+            case Collection<?> collection -> recurseIntoCollection(path, visited, nullPaths, collection);
 
-            case Map<?, ?> map -> {
-                recurseIntoMap(path, visited, nullPaths, map);
-                return;
-            }
+            case Map<?, ?> map -> recurseIntoMap(path, visited, nullPaths, map);
 
-            case Record ignored -> {
-                recurseIntoRecord(obj, path, visited, nullPaths, clazz);
-                return;
-            }
+            case Record ignored -> recurseIntoRecord(obj, path, visited, nullPaths, clazz);
 
-            case Object o when clazz.isArray() -> {
-                recurseIntoArray(obj, path, visited, nullPaths);
-                return;
-            }
+            case Object o when clazz.isArray() ->  recurseIntoArray(obj, path, visited, nullPaths);
 
             // no need to recurse into these, jdk classes are fine if they arte not null themselves, no need to look in their innards
-            case Object object when object.getClass().getName().startsWith("java") -> {
-                return;
-            }
+            case Object object when object.getClass().getName().startsWith("java") -> {}
 
             // no need to recurse into these
-            case Enum<?> ignored -> {
-                return;
-            }
+            case Enum<?> ignored -> {}
 
-            default -> {
-                // will get covered later
-            }
+            default -> recurseIntoPlainClass(obj, path, visited, nullPaths, clazz);
         }
+    }
 
+    private static void recurseIntoPlainClass(Object obj, String path, Set<Integer> visited, List<String> nullPaths, Class<?> clazz) {
         // Handle regular (non-record) classes by reflecting over fields
         // Iterate through class hierarchy to include inherited fields
         Class<?> current = clazz;
