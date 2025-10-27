@@ -3,6 +3,7 @@ package net.vanfleteren.nonulls.jackson2.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import net.vanfleteren.nonulls.validator.NullsFoundException;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -60,7 +61,11 @@ public sealed interface Result<T> {
         };
     }
 
-    record Success<T>(T value) implements Result<T> {}
+    record Success<T>(T value) implements Result<T> {
+        public Success {
+            Objects.requireNonNull(value);
+        }
+    }
 
     sealed interface Failure<T> extends Result<T> {
         Exception exception();

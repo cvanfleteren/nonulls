@@ -27,8 +27,7 @@ public final class NullFilteringSetDeserializer extends StdDeserializer<Set<?>>
     }
 
     @Override
-    public JsonDeserializer<?> createContextual(DeserializationContext ctxt, @Nullable BeanProperty property)
-            throws JsonMappingException {
+    public JsonDeserializer<?> createContextual(DeserializationContext ctxt, @Nullable BeanProperty property) {
         JavaType wrapperType = property != null ? property.getType() : ctxt.getContextualType();
         JavaType elementType = wrapperType.containedType(0);
         return new NullFilteringSetDeserializer(elementType);
@@ -39,15 +38,11 @@ public final class NullFilteringSetDeserializer extends StdDeserializer<Set<?>>
         LinkedHashSet<Object> result = new LinkedHashSet<>();
 
         if (p.getCurrentToken() != JsonToken.START_ARRAY) {
-            ctxt.reportWrongTokenException(this, JsonToken.START_ARRAY,
-                    "Expected array start");
+            ctxt.reportWrongTokenException(this, JsonToken.START_ARRAY, "Expected array start");
             return result;
         }
 
-        JsonDeserializer<Object> elementDeserializer = null;
-        if (elementType != null) {
-            elementDeserializer = ctxt.findRootValueDeserializer(elementType);
-        }
+        JsonDeserializer<Object> elementDeserializer = ctxt.findRootValueDeserializer(elementType);
 
         while (p.nextToken() != JsonToken.END_ARRAY) {
             if (p.getCurrentToken() == JsonToken.VALUE_NULL) {
@@ -55,7 +50,7 @@ public final class NullFilteringSetDeserializer extends StdDeserializer<Set<?>>
                 continue;
             }
 
-            if(p.getCurrentToken() == JsonToken.VALUE_STRING) {
+            if (p.getCurrentToken() == JsonToken.VALUE_STRING) {
                 // skip empty strings
                 String value = p.getValueAsString();
                 if (value == null || value.isBlank()) {
@@ -65,9 +60,7 @@ public final class NullFilteringSetDeserializer extends StdDeserializer<Set<?>>
 
             if (elementDeserializer != null) {
                 Object element = elementDeserializer.deserialize(p, ctxt);
-                if (element != null) {
-                    result.add(element);
-                }
+                result.add(element);
             }
         }
 

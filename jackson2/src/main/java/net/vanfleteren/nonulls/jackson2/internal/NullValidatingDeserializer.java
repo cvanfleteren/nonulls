@@ -24,13 +24,11 @@ public final class NullValidatingDeserializer<T> extends StdDeserializer<T> impl
     public T deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         T result = defaultDeserializer.deserialize(p, ctxt);
 
-        if (result != null) {
-            try {
-                NullValidator.assertNoNulls(result);
-            } catch (NullsFoundException e) {
-                String message = "Null validation failed: " + e.getMessage();
-                throw JsonMappingException.from(p, message, e);
-            }
+        try {
+            NullValidator.assertNoNulls(result);
+        } catch (NullsFoundException e) {
+            String message = "Null validation failed: " + e.getMessage();
+            throw JsonMappingException.from(p, message, e);
         }
 
         return result;

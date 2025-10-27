@@ -29,8 +29,7 @@ public final class NullFilteringMapDeserializer extends StdDeserializer<Map<?, ?
     }
 
     @Override
-    public JsonDeserializer<?> createContextual(DeserializationContext ctxt, @Nullable BeanProperty property)
-            throws JsonMappingException {
+    public JsonDeserializer<?> createContextual(DeserializationContext ctxt, @Nullable BeanProperty property) {
         JavaType wrapperType = property != null ? property.getType() : ctxt.getContextualType();
         JavaType valueType = wrapperType.containedType(1);
         return new NullFilteringMapDeserializer(valueType);
@@ -41,18 +40,14 @@ public final class NullFilteringMapDeserializer extends StdDeserializer<Map<?, ?
         LinkedHashMap<Object, Object> result = new LinkedHashMap<>();
 
         if (p.getCurrentToken() != JsonToken.START_OBJECT) {
-            ctxt.reportWrongTokenException(this, JsonToken.START_OBJECT,
-                    "Expected object start");
+            ctxt.reportWrongTokenException(this, JsonToken.START_OBJECT, "Expected object start");
             return result;
         }
 
-        JsonDeserializer<Object> valueDeserializer = null;
-        if (valueType != null) {
-            valueDeserializer = ctxt.findRootValueDeserializer(valueType);
-        }
+        JsonDeserializer<Object> valueDeserializer = ctxt.findRootValueDeserializer(valueType);
 
         while (p.nextToken() != JsonToken.END_OBJECT) {
-            String fieldName = p.getCurrentName();
+            String fieldName = p.currentName();
             p.nextToken();
 
             if (p.getCurrentToken() == JsonToken.VALUE_NULL && valueType.getRawClass() != Optional.class) {
@@ -66,7 +61,7 @@ public final class NullFilteringMapDeserializer extends StdDeserializer<Map<?, ?
             }
 
             Object value = valueDeserializer != null ? valueDeserializer.deserialize(p, ctxt) : p.readValueAs(Object.class);
-            if (value != null && !(value instanceof String s && s.isBlank())) {
+            if (!(value instanceof String s && s.isBlank())) {
                 result.put(fieldName, value);
             }
         }

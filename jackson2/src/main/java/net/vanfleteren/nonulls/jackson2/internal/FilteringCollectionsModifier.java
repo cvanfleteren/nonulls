@@ -24,7 +24,7 @@ public final class FilteringCollectionsModifier extends com.fasterxml.jackson.da
                                                             CollectionType type,
                                                             BeanDescription beanDesc,
                                                             JsonDeserializer<?> deserializer) {
-        return new FilteringCollectionDeserializer((JsonDeserializer<Object>) deserializer);
+        return new FilteringCollectionDeserializer((JsonDeserializer<Object>) deserializer, true);
     }
 
     @Override
@@ -32,7 +32,7 @@ public final class FilteringCollectionsModifier extends com.fasterxml.jackson.da
                                                                 CollectionLikeType type,
                                                                 BeanDescription beanDesc,
                                                                 JsonDeserializer<?> deserializer) {
-        return new FilteringCollectionDeserializer((JsonDeserializer<Object>) deserializer);
+        return new FilteringCollectionDeserializer((JsonDeserializer<Object>) deserializer, true);
     }
 
     @Override
@@ -47,10 +47,6 @@ public final class FilteringCollectionsModifier extends com.fasterxml.jackson.da
     private static final class FilteringCollectionDeserializer extends JsonDeserializer<Object> implements ContextualDeserializer {
         private final JsonDeserializer<Object> delegate;
         private final boolean skipEmptyStrings;
-
-        FilteringCollectionDeserializer(JsonDeserializer<Object> delegate) {
-            this(delegate, true); // or inject via builder
-        }
 
         FilteringCollectionDeserializer(JsonDeserializer<Object> delegate, boolean skipEmptyStrings) {
             this.delegate = delegate;
@@ -104,9 +100,7 @@ public final class FilteringCollectionsModifier extends com.fasterxml.jackson.da
         @Override
         public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             Object arr = delegate.deserialize(p, ctxt);
-            if (arr == null) {
-                return Array.newInstance(componentClass, 0);
-            }
+
             if (!arr.getClass().isArray()) return arr;
             int len = Array.getLength(arr);
             ArrayList<Object> tmp = new ArrayList<>(len);
@@ -129,7 +123,7 @@ public final class FilteringCollectionsModifier extends com.fasterxml.jackson.da
         }
 
         @Override
-        public Object getNullValue(DeserializationContext ctxt) throws JsonMappingException {
+        public Object getNullValue(DeserializationContext ctxt) {
             return Array.newInstance(componentClass, 0);
         }
     }
