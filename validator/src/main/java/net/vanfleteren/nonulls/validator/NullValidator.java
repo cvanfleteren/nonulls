@@ -3,6 +3,7 @@ package net.vanfleteren.nonulls.validator;
 import net.vanfleteren.nonulls.validator.spi.RecursiveValidator;
 import net.vanfleteren.nonulls.validator.spi.TypeValidator;
 import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Contract;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -36,6 +37,7 @@ public class NullValidator {
      * @param obj the object to validate
      * @throws NullsFoundException if any null value is found in the object graph
      */
+    @Contract(value = "null -> fail; !null -> param1", pure = true)
     public static <T> T assertNoNulls(@Nullable T obj) throws NullsFoundException {
         List<String> nullPaths = findNullPaths(obj);
         if (!nullPaths.isEmpty()) {
@@ -51,6 +53,7 @@ public class NullValidator {
      * @param obj the object to validate
      * @return a list of paths where nulls were found, empty if no nulls were found
      */
+    @Contract(value = "_ -> new", pure = true)
     public static List<String> findNullPaths(@Nullable Object obj) {
         List<String> nullPaths = new ArrayList<>();
         collectNullPaths(obj, "root", new HashSet<>(), nullPaths);
@@ -64,8 +67,9 @@ public class NullValidator {
      * @param obj the object to check
      * @return true if no nulls are found, false otherwise
      */
+    @Contract(value = "null -> false", pure = true)
     public static boolean hasNoNulls(@Nullable Object obj) {
-       return findNullPaths(obj).isEmpty();
+        return findNullPaths(obj).isEmpty();
     }
 
     /**
@@ -100,7 +104,6 @@ public class NullValidator {
             }
         }
 
-
         switch (obj) {
             case Optional<?> optional -> {
                 optional.ifPresent(value -> collectNullPaths(value, path, visited, nullPaths));
@@ -108,46 +111,22 @@ public class NullValidator {
             }
 
             case Collection<?> collection -> {
-                int index = 0;
-                for (Object item : collection) {
-                    collectNullPaths(item, path + "[" + index + "]", visited, nullPaths);
-                    index++;
-                }
+                recurseIntoCollection(path, visited, nullPaths, collection);
                 return;
             }
 
             case Map<?, ?> map -> {
-                for (Map.Entry<?, ?> entry : map.entrySet()) {
-                    collectNullPaths(entry.getKey(), path + ".key[" + entry.getKey() + "]", visited, nullPaths);
-                    collectNullPaths(entry.getValue(), path + "[" + entry.getKey() + "]", visited, nullPaths);
-                }
+                recurseIntoMap(path, visited, nullPaths, map);
                 return;
             }
 
-            case Record record -> {
-                RecordComponent[] components = clazz.getRecordComponents();
-                for (RecordComponent component : components) {
-                    try {
-                        var accessor = component.getAccessor();
-                        boolean wasAccessible = accessor.canAccess(obj);
-                        if (!wasAccessible) {
-                            accessor.setAccessible(true);
-                        }
-                        try {
-                            Object value = accessor.invoke(obj);
-                            collectNullPaths(value, path + "." + component.getName(), visited, nullPaths);
-                        } finally {
-                            if (!wasAccessible) {
-                                try {
-                                    accessor.setAccessible(false);
-                                } catch (Exception ignored) {
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                        throw new RuntimeException("Failed to access record component: " + component.getName() + " at " + path + ". Is the component accessible?", e);
-                    }
-                }
+            case Record ignored -> {
+                recurseIntoRecord(obj, path, visited, nullPaths, clazz);
+                return;
+            }
+
+            case Object o when clazz.isArray() -> {
+                recurseIntoArray(obj, path, visited, nullPaths);
                 return;
             }
 
@@ -157,23 +136,13 @@ public class NullValidator {
             }
 
             // no need to recurse into these
-            case Enum<?> enumeration -> {
+            case Enum<?> ignored -> {
                 return;
             }
 
             default -> {
                 // will get covered later
             }
-        }
-
-        // Handle Arrays
-        if (clazz.isArray()) {
-            int length = Array.getLength(obj);
-            for (int i = 0; i < length; i++) {
-                Object item = Array.get(obj, i);
-                collectNullPaths(item, path + "[" + i + "]", visited, nullPaths);
-            }
-            return;
         }
 
         // Handle regular (non-record) classes by reflecting over fields
@@ -210,6 +179,54 @@ public class NullValidator {
         }
     }
 
+    private static void recurseIntoArray(Object obj, String path, Set<Integer> visited, List<String> nullPaths) {
+        int length = Array.getLength(obj);
+        for (int i = 0; i < length; i++) {
+            Object item = Array.get(obj, i);
+            collectNullPaths(item, path + "[" + i + "]", visited, nullPaths);
+        }
+    }
+
+    private static void recurseIntoRecord(Object obj, String path, Set<Integer> visited, List<String> nullPaths, Class<?> clazz) {
+        RecordComponent[] components = clazz.getRecordComponents();
+        for (RecordComponent component : components) {
+            try {
+                var accessor = component.getAccessor();
+                boolean wasAccessible = accessor.canAccess(obj);
+                if (!wasAccessible) {
+                    accessor.setAccessible(true);
+                }
+                try {
+                    Object value = accessor.invoke(obj);
+                    collectNullPaths(value, path + "." + component.getName(), visited, nullPaths);
+                } finally {
+                    if (!wasAccessible) {
+                        try {
+                            accessor.setAccessible(false);
+                        } catch (Exception ignored) {
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to access record component: " + component.getName() + " at " + path + ". Is the component accessible?", e);
+            }
+        }
+    }
+
+    private static void recurseIntoMap(String path, Set<Integer> visited, List<String> nullPaths, Map<?, ?> map) {
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            collectNullPaths(entry.getKey(), path + ".key[" + entry.getKey() + "]", visited, nullPaths);
+            collectNullPaths(entry.getValue(), path + "[" + entry.getKey() + "]", visited, nullPaths);
+        }
+    }
+
+    private static void recurseIntoCollection(String path, Set<Integer> visited, List<String> nullPaths, Collection<?> collection) {
+        int index = 0;
+        for (Object item : collection) {
+            collectNullPaths(item, path + "[" + index + "]", visited, nullPaths);
+            index++;
+        }
+    }
 
 
     private static boolean isPrimitiveOrWrapper(Class<?> clazz) {
