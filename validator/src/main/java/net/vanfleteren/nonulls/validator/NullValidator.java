@@ -151,6 +151,10 @@ public class NullValidator {
                 return;
             }
 
+            case Enum<?> enumeration -> {
+                return;
+            }
+
             default -> {
                 // will get covered later
             }

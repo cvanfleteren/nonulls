@@ -13,6 +13,7 @@ class NullValidatorPojosTest {
     @AllArgsConstructor
     protected static class PlainPojo {
         private String s;
+        FooEnum fooEnum;
     }
     @AllArgsConstructor
     public static class InnerPojo {
@@ -38,11 +39,20 @@ class NullValidatorPojosTest {
     @AllArgsConstructor
     static class ChildPojo extends ParentPojo { String c; }
 
+    enum FooEnum { A, B }
+
 
     @Test
     void pojo_withNullField_reportsFieldPath() {
-        PlainPojo p = new PlainPojo(null);
+        PlainPojo p = new PlainPojo(null, null);
         
+        assertEquals(List.of("root.s","root.fooEnum"), NullValidator.findNullPaths(p));
+    }
+
+    @Test
+    void pojo_withEnumField_reportsFieldPath() {
+        PlainPojo p = new PlainPojo(null, FooEnum.A);
+
         assertEquals(List.of("root.s"), NullValidator.findNullPaths(p));
     }
 
