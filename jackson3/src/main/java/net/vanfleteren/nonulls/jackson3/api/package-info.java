@@ -1,0 +1,5 @@
+/**
+ * Public API for the NoNulls Jackson 2 integration.
+ */
+@org.jspecify.annotations.NullMarked
+package net.vanfleteren.nonulls.jackson3.api;

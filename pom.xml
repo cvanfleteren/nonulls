@@ -29,6 +29,7 @@
     </developers>
     <modules>
         <module>jackson2</module>
+        <module>jackson3</module>
         <module>validator</module>
         <module>validator-vavr</module>
     </modules>
