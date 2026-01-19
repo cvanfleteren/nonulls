@@ -14,7 +14,7 @@
     <description>Integration of NoNulls validator with Jackson2</description>
 
     <properties>
-        <jackson.version>2.20.0</jackson.version>
+        <jackson.version>2.21.0</jackson.version>
     </properties>
 
     <dependencies>
