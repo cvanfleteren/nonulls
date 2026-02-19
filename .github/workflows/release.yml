@@ -57,6 +57,16 @@ jobs:
           CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
+      - name: Update version in README
+        if: steps.vars.outputs.is_semver == 'true'
+        run: |
+          sed -i 's|<!-- latest-version -->|'"${{ steps.vars.outputs.version }}"'|g' README.md
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "chore: update latest version in README to ${{ steps.vars.outputs.version }} [skip ci]"
+          git push
+
       - name: Print success message
         if: steps.vars.outputs.is_semver == 'true'
         run: |
